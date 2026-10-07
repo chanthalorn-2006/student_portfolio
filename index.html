@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lorn Chantha | System & Network Administration & Cybersecurity</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            800: '#1E293B',
+                            900: '#0F172A',
+                            950: '#0B0F19',
+                        },
+                        brand: {
+                            blue: '#2563EB',
+                            light: '#38BDF8',
+                            cyan: '#06B6D4',
+                            accent: '#3B82F6',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    },
+                    animation: {
+                        'pulse-glow': 'pulseGlow 3s infinite ease-in-out',
+                        'float': 'floating 3s infinite ease-in-out',
+                    },
+                    keyframes: {
+                        pulseGlow: {
+                            '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+                            '50%': { opacity: '0.8', transform: 'scale(1.05)' }
+                        },
+                        floating: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- JSZip & FileSaver CDN for live zip download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+    <!-- Three.js CDN for 3D Graphics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A;
+            color: #F8FAFC;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+        }
+
+        .glass-panel-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-panel-hover:hover {
+            border-color: rgba(56, 189, 248, 0.4);
+            box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.3);
+            transform: translateY(-3px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0F172A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1E293B;
+            border-radius: 4px;
+            border: 1px solid rgba(56, 189, 248, 0.2);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2563EB;
+        }
+
+        /* Neon Glow Text */
+        .neon-text-blue {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.5), 0 0 20px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Gradient Borders */
+        .gradient-border {
+            position: relative;
+            background: linear-gradient(#0F172A, #0F172A) padding-box,
+                        linear-gradient(135deg, #2563EB, #38BDF8, #06B6D4) border-box;
+            border: 1px solid transparent;
+        }
+
+        #three-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-navy-900 text-slate-100 antialiased selection:bg-brand-blue selection:text-white">
+
+    <header class="fixed top-0 left-0 w-full z-50 glass-panel border-b border-slate-800/80 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            
+            <!-- Brand Logo -->
+            <a href="#home" class="flex items-center gap-2 group">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-blue to-brand-light flex items-center justify-center font-bold text-white shadow-lg shadow-brand-blue/30 group-hover:scale-105 transition-transform">
+                    LC
+                </div>
+                <div class="flex flex-col">
+                    <span class="text-lg font-extrabold tracking-wider text-white group-hover:text-brand-light transition-colors">LC<span class="text-brand-light">.</span></span>
+                    <span class="text-[10px] text-slate-400 font-mono -mt-1 tracking-widest">SNAC • PNC</span>
+                </div>
+            </a>
+
+            <!-- Desktop Navigation Links -->
+            <nav class="hidden md:flex items-center gap-8">
+                <a href="#home" class="nav-link text-sm font-medium text-slate-300 hover:text-brand-light transition-colors flex items-center gap-1.5 active">
+                    <i class="fa-solid fa-house text-xs text-brand-light"></i> Home
+                </a>
+                <a href="#about" class="nav-link text-sm font-medium text-slate-300 hover:text-brand-light transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-user text-xs text-brand-light"></i> About
+                </a>
+                <a href="#skills" class="nav-link text-sm font-medium text-slate-300 hover:text-brand-light transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-layer-group text-xs text-brand-light"></i> Skills
+                </a>
+                <a href="#projects" class="nav-link text-sm font-medium text-slate-300 hover:text-brand-light transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-folder-open text-xs text-brand-light"></i> Projects
+                </a>
+                <a href="#education" class="nav-link text-sm font-medium text-slate-300 hover:text-brand-light transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-graduation-cap text-xs text-brand-light"></i> Education
+                </a>
+                <a href="#terminal" class="nav-link text-sm font-medium text-slate-300 hover:text-brand-light transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-terminal text-xs text-brand-light"></i> Terminal
+                </a>
+                <a href="#contact" class="nav-link text-sm font-medium text-slate-300 hover:text-brand-light transition-colors flex items-center gap-1.5">
+                    <i class="fa-solid fa-paper-plane text-xs text-brand-light"></i> Contact
+                </a>
+            </nav>
+
+            <!-- Call to Action & Mobile Button -->
+            <div class="flex items-center gap-4">
+                <button onclick="downloadPortfolioZip()" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/50 text-emerald-400 text-xs font-semibold tracking-wide transition-all duration-300" title="Download entire portfolio project as ZIP">
+                    <i class="fa-solid fa-file-zipper text-emerald-400"></i>
+                    <span>Download ZIP</span>
+                </button>
+
+                <a href="#contact" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-blue/20 hover:bg-brand-blue/40 border border-brand-blue/50 text-brand-light text-xs font-semibold tracking-wide transition-all duration-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Available for Work
+                </a>
+
+                <!-- Mobile Hamburger Button -->
+                <button id="mobile-menu-btn" class="md:hidden p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white focus:outline-none" aria-label="Toggle menu">
+                    <i class="fa-solid fa-bars text-xl" id="menu-icon"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu Navigation Drawer -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-slate-800/80 px-4 pt-3 pb-6 space-y-3">
+            <a href="#home" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-800 hover:text-brand-light"><i class="fa-solid fa-house w-6 text-brand-light"></i> Home</a>
+            <a href="#about" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-800 hover:text-brand-light"><i class="fa-solid fa-user w-6 text-brand-light"></i> About</a>
+            <a href="#skills" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-800 hover:text-brand-light"><i class="fa-solid fa-layer-group w-6 text-brand-light"></i> Skills</a>
+            <a href="#projects" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-800 hover:text-brand-light"><i class="fa-solid fa-folder-open w-6 text-brand-light"></i> Projects</a>
+            <a href="#education" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-800 hover:text-brand-light"><i class="fa-solid fa-graduation-cap w-6 text-brand-light"></i> Education</a>
+            <a href="#terminal" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-800 hover:text-brand-light"><i class="fa-solid fa-terminal w-6 text-brand-light"></i> Interactive Terminal</a>
+            <a href="#contact" class="mobile-nav-link block px-3 py-2 rounded-md text-base font-medium text-slate-200 hover:bg-slate-800 hover:text-brand-light"><i class="fa-solid fa-paper-plane w-6 text-brand-light"></i> Contact</a>
+            
+            <button onclick="downloadPortfolioZip()" class="w-full mt-2 py-2.5 px-3 rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-semibold text-sm flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-zipper"></i> Download Project (.zip)
+            </button>
+        </div>
+    </header>
+
+    <section id="home" class="relative min-h-screen pt-28 pb-16 flex items-center justify-center overflow-hidden bg-gradient-to-b from-navy-950 via-navy-900 to-navy-900">
+        
+        <!-- Ambient Background Lights -->
+        <div class="absolute top-1/4 left-10 w-96 h-96 bg-brand-blue/20 rounded-full blur-3xl pointer-events-none animate-pulse-glow"></div>
+        <div class="absolute bottom-10 right-10 w-96 h-96 bg-brand-light/10 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center relative z-10">
+            
+            <!-- Left Hero Content -->
+            <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                
+                <!-- Status Badge -->
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-panel border-brand-light/30 text-brand-light text-xs font-semibold tracking-wide">
+                    <span class="flex h-2 w-2 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-light opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-light"></span>
+                    </span>
+                    IT Student • PNC • SNAC Batch
+                </div>
+
+                <!-- Main Greeting & Title -->
+                <div class="space-y-2">
+                    <h2 class="text-sm uppercase tracking-widest font-mono font-bold text-brand-light">
+                        HELLO, I'M LORN CHANTHA
+                    </h2>
+                    <h1 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-tight">
+                        System & Network <br class="hidden sm:inline"/>
+                        <span class="bg-gradient-to-r from-brand-light via-blue-400 to-brand-blue bg-clip-text text-transparent neon-text-blue">
+                            Administration & Cybersecurity
+                        </span>
+                    </h1>
+                </div>
+
+                <!-- Short Description -->
+                <p class="text-base sm:text-lg text-slate-300 max-w-2xl leading-relaxed mx-auto lg:mx-0">
+                    I am an IT student passionate about networking, system administration, and cybersecurity. I learn by building, practicing, and solving real-world technical problems.
+                </p>
+
+                <!-- Core Technical Badges -->
+                <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-2">
+                    <span class="px-3.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700/80 text-xs font-mono font-semibold text-slate-200 flex items-center gap-2 shadow-sm hover:border-brand-light/50 transition-colors">
+                        <i class="fa-solid fa-network-wired text-brand-light"></i> Networking
+                    </span>
+                    <span class="px-3.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700/80 text-xs font-mono font-semibold text-slate-200 flex items-center gap-2 shadow-sm hover:border-brand-light/50 transition-colors">
+                        <i class="fa-brands fa-linux text-amber-400"></i> Linux
+                    </span>
+                    <span class="px-3.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700/80 text-xs font-mono font-semibold text-slate-200 flex items-center gap-2 shadow-sm hover:border-brand-light/50 transition-colors">
+                        <i class="fa-solid fa-shield-halved text-emerald-400"></i> Cybersecurity
+                    </span>
+                    <span class="px-3.5 py-1.5 rounded-lg bg-slate-800/90 border border-slate-700/80 text-xs font-mono font-semibold text-slate-200 flex items-center gap-2 shadow-sm hover:border-brand-light/50 transition-colors">
+                        <i class="fa-solid fa-server text-cyan-400"></i> SysAdmin
+                    </span>
+                </div>
+
+                <!-- Action Call-To-Action Buttons -->
+                <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                    <a href="#projects" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-brand-blue to-blue-600 hover:from-blue-600 hover:to-brand-blue text-white font-semibold shadow-lg shadow-brand-blue/30 flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.02]">
+                        <span>View My Projects</span>
+                        <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </a>
+                    
+                    <button onclick="downloadCV()" class="w-full sm:w-auto px-7 py-3.5 rounded-xl glass-panel border border-brand-light/40 hover:border-brand-light text-slate-200 hover:text-white font-semibold flex items-center justify-center gap-3 transition-all duration-300 hover:scale-[1.02] group">
+                        <i class="fa-solid fa-download text-brand-light group-hover:translate-y-0.5 transition-transform"></i>
+                        <span>Download CV</span>
+                    </button>
+                </div>
+
+                <!-- Quick Stats row -->
+                <div class="grid grid-cols-3 gap-4 pt-6 border-t border-slate-800/80 max-w-lg mx-auto lg:mx-0 text-center">
+                    <div>
+                        <div class="text-2xl font-bold font-mono text-white">15+</div>
+                        <div class="text-xs text-slate-400">Lab Topologies</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold font-mono text-brand-light">100%</div>
+                        <div class="text-xs text-slate-400">Passerelles Numériques</div>
+                    </div>
+                    <div>
+                        <div class="text-2xl font-bold font-mono text-emerald-400">24/7</div>
+                        <div class="text-xs text-slate-400">SysAdmin Passion</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Hero Section: 3D Interactive Profile Avatar Canvas -->
+            <div class="lg:col-span-5 relative flex justify-center items-center">
+                
+                <!-- Glassmorphism Container Frame for 3D Viewport -->
+                <div class="relative w-full aspect-square max-w-[480px] rounded-3xl glass-panel p-2 shadow-2xl border border-brand-light/30 gradient-border group">
+                    
+                    <!-- Top Canvas Header Controls -->
+                    <div class="absolute top-4 left-4 right-4 z-20 flex items-center justify-between px-3 py-1.5 rounded-lg bg-navy-950/80 backdrop-blur border border-slate-800 text-xs font-mono text-slate-300">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="text-[11px]" id="avatar-mode-label">3D_PROFILE_NODE.OBJ</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <!-- Direct Photo Upload Button -->
+                            <label for="hero-photo-upload" class="px-2.5 py-1 rounded bg-brand-blue/40 text-brand-light hover:bg-brand-blue/70 border border-brand-light/40 text-[11px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm" title="Upload your real profile photo to 3D avatar">
+                                <i class="fa-solid fa-camera text-brand-light"></i> <span>Upload Profile Photo</span>
+                            </label>
+                            <input type="file" id="hero-photo-upload" accept="image/*" class="hidden" onchange="uploadHeroProfilePhoto(event)">
+
+                            <!-- Photo Manual Rotation Button -->
+                            <button id="btn-rotate-photo" onclick="rotateProfilePhoto()" title="Rotate Photo 90 degrees" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] transition-colors flex items-center gap-1">
+                                <i class="fa-solid fa-rotate"></i> Rotate
+                            </button>
+
+                            <button id="btn-reset-cam" title="Reset View" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] transition-colors">
+                                <i class="fa-solid fa-rotate-left"></i> Reset
+                            </button>
+                            <button id="btn-toggle-spin" title="Toggle Auto-Spin" class="px-2 py-0.5 rounded bg-brand-blue/30 text-brand-light hover:bg-brand-blue/50 text-[10px] transition-colors">
+                                <i class="fa-solid fa-arrows-spin"></i> Spin
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Floating Badges -->
+                    <div class="absolute -top-3 -right-3 z-20 glass-panel px-3 py-1.5 rounded-xl border border-brand-light/50 shadow-lg flex items-center gap-2 text-xs font-mono text-brand-light animate-float">
+                        <i class="fa-solid fa-shield-halved text-emerald-400"></i> Cyber Defense
+                    </div>
+
+                    <div class="absolute -bottom-3 -left-3 z-20 glass-panel px-3 py-1.5 rounded-xl border border-brand-blue/50 shadow-lg flex items-center gap-2 text-xs font-mono text-slate-200 animate-float" style="animation-delay: 1.5s;">
+                        <i class="fa-solid fa-network-wired text-brand-light"></i> Cisco / MikroTik
+                    </div>
+
+                    <!-- Three.js Canvas Container -->
+                    <div id="canvas-container" class="w-full h-full rounded-2xl overflow-hidden relative cursor-grab active:cursor-grabbing">
+                        <canvas id="three-canvas"></canvas>
+                        
+                        <!-- Overlay Touch/Mouse Prompt -->
+                        <div id="canvas-prompt" class="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 px-3.5 py-1.5 rounded-full bg-navy-950/90 border border-brand-light/40 text-[11px] font-mono text-slate-200 pointer-events-none flex items-center gap-2 backdrop-blur-md shadow-lg">
+                            <i class="fa-solid fa-camera text-brand-light"></i> Drag & drop photo or click "Upload Profile Photo"
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <section id="about" class="py-24 bg-navy-900 border-t border-slate-800/80 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-light text-xs font-mono font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-brand-blue/10 border border-brand-blue/30">
+                    Get To Know Me
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">
+                    About <span class="text-brand-light">Lorn Chantha</span>
+                </h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                    Dedicated IT student specialized in infrastructure, secure networking, and server systems administration.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                
+                <div class="lg:col-span-7 glass-panel p-6 sm:p-8 rounded-2xl space-y-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-brand-blue/20 border border-brand-blue/40 flex items-center justify-center text-brand-light text-xl">
+                                <i class="fa-solid fa-user-gear"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">System & Network Administrator in Training</h3>
+                                <p class="text-xs font-mono text-brand-light">Passerelles Numériques Cambodia (PNC)</p>
+                            </div>
+                        </div>
+
+                        <p class="text-slate-300 leading-relaxed text-sm sm:text-base">
+                            I am currently pursuing specialized training in **System & Network Administration & Cybersecurity (SNAC)** at Passerelles Numériques Cambodia. My focus is centered on configuring robust networking architectures, securing Linux/Windows server infrastructures, and performing security vulnerability assessments.
+                        </p>
+
+                        <p class="text-slate-300 leading-relaxed text-sm sm:text-base mt-4">
+                            Through hands-on practical lab environments, I configure routers, firewalls, DNS/DHCP servers, VPNs, and Active Directory domains. I enjoy taking on complex technical troubleshooting and automating daily system maintenance tasks.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-800">
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-check-circle text-emerald-400 text-lg mt-0.5"></i>
+                            <div>
+                                <h4 class="text-sm font-semibold text-white">Hands-on Lab Focused</h4>
+                                <p class="text-xs text-slate-400">Practicing with PfSense, Cisco Packet Tracer, and GNS3 daily.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i class="fa-solid fa-shield-virus text-brand-light text-lg mt-0.5"></i>
+                            <div>
+                                <h4 class="text-sm font-semibold text-white">Security-First Mindset</h4>
+                                <p class="text-xs text-slate-400">Hardening systems against attacks & monitoring traffic logs.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-5 space-y-4 flex flex-col justify-between">
+                    <div class="glass-panel p-6 rounded-2xl space-y-4">
+                        <h3 class="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
+                            <i class="fa-solid fa-address-card text-brand-light"></i> Quick Bio Details
+                        </h3>
+
+                        <div class="space-y-3 font-mono text-xs sm:text-sm">
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-800/50">
+                                <span class="text-slate-400">Name:</span>
+                                <span class="font-semibold text-white">Lorn Chantha</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-800/50">
+                                <span class="text-slate-400">Institution:</span>
+                                <span class="font-semibold text-brand-light">Passerelles Numériques (PNC)</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-800/50">
+                                <span class="text-slate-400">Specialization:</span>
+                                <span class="font-semibold text-white">SNAC (Network & Security)</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5 border-b border-slate-800/50">
+                                <span class="text-slate-400">Location:</span>
+                                <span class="font-semibold text-white">Phnom Penh, Cambodia</span>
+                            </div>
+                            <div class="flex justify-between items-center py-1.5">
+                                <span class="text-slate-400">Status:</span>
+                                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-semibold">Open for Internship</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-6 rounded-2xl bg-gradient-to-br from-brand-blue/10 to-transparent border-brand-blue/30">
+                        <h4 class="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-400"></i> Philosophy
+                        </h4>
+                        <p class="text-xs text-slate-300 italic leading-relaxed">
+                            "A secure network isn't built in a day—it is forged through continuous monitoring, rigorous testing, and proactive system hardening."
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-24 bg-navy-950 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-light text-xs font-mono font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-brand-blue/10 border border-brand-blue/30">
+                    Technical Stack
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">
+                    Skills & <span class="text-brand-light">Expertise</span>
+                </h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                    Core technical skills honed through practical SNAC curriculum labs and independent technical projects.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Skill Card 1: Networking Infrastructure -->
+                <div class="glass-panel p-6 rounded-2xl glass-panel-hover border border-slate-800 space-y-4">
+                    <div class="w-12 h-12 rounded-xl bg-brand-blue/20 border border-brand-blue/40 flex items-center justify-center text-brand-light text-2xl">
+                        <i class="fa-solid fa-network-wired"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Networking Infrastructure</h3>
+                    <p class="text-xs text-slate-400">Designing and configuring reliable IPv4/IPv6 networks and VLAN structures.</p>
+                    
+                    <ul class="space-y-2.5 pt-2">
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-brand-light mr-2"></i>Cisco Routing & Switching</span>
+                            <span class="text-brand-light font-bold">Advanced</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-brand-light mr-2"></i>VLANs & Subnetting (CIDR)</span>
+                            <span class="text-brand-light font-bold">Advanced</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-brand-light mr-2"></i>DHCP / DNS / NAT Setup</span>
+                            <span class="text-brand-light font-bold">Intermediate</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-brand-light mr-2"></i>Wireshark Packet Analysis</span>
+                            <span class="text-brand-light font-bold">Intermediate</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-brand-light mr-2"></i>MikroTik RouterOS</span>
+                            <span class="text-brand-light font-bold">Intermediate</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Skill Card 2: System Administration & Linux -->
+                <div class="glass-panel p-6 rounded-2xl glass-panel-hover border border-slate-800 space-y-4">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 text-2xl">
+                        <i class="fa-brands fa-linux"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Linux & System Admin</h3>
+                    <p class="text-xs text-slate-400">Deploying, hardening, and maintaining Linux and Windows server environments.</p>
+                    
+                    <ul class="space-y-2.5 pt-2">
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-amber-400 mr-2"></i>Ubuntu Server & Debian</span>
+                            <span class="text-amber-400 font-bold">Advanced</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-amber-400 mr-2"></i>Windows Server & AD DS</span>
+                            <span class="text-amber-400 font-bold">Intermediate</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-amber-400 mr-2"></i>Bash Shell Scripting</span>
+                            <span class="text-amber-400 font-bold">Intermediate</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-amber-400 mr-2"></i>Nginx & Apache Web Server</span>
+                            <span class="text-amber-400 font-bold">Intermediate</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-amber-400 mr-2"></i>SSH Key Security Hardening</span>
+                            <span class="text-amber-400 font-bold">Advanced</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Skill Card 3: Cybersecurity & Defense -->
+                <div class="glass-panel p-6 rounded-2xl glass-panel-hover border border-slate-800 space-y-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-2xl">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white">Cybersecurity & Defense</h3>
+                    <p class="text-xs text-slate-400">Protecting network perimeter, managing firewalls, and security auditing.</p>
+                    
+                    <ul class="space-y-2.5 pt-2">
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-emerald-400 mr-2"></i>PfSense & IPTables Firewalls</span>
+                            <span class="text-emerald-400 font-bold">Advanced</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-emerald-400 mr-2"></i>OpenVPN & IPsec Gateways</span>
+                            <span class="text-emerald-400 font-bold">Intermediate</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Nmap Vulnerability Scanning</span>
+                            <span class="text-emerald-400 font-bold">Intermediate</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Kali Linux Fundamentals</span>
+                            <span class="text-emerald-400 font-bold">Intermediate</span>
+                        </li>
+                        <li class="flex items-center justify-between text-xs font-mono">
+                            <span class="text-slate-300"><i class="fa-solid fa-check text-emerald-400 mr-2"></i>Log Analysis & Monitoring</span>
+                            <span class="text-emerald-400 font-bold">Intermediate</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Virtualization Banner -->
+            <div class="mt-12 glass-panel p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-6 border-slate-800">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400 text-2xl shrink-0">
+                        <i class="fa-solid fa-cubes"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-base font-bold text-white">Virtualization & IT Tools</h4>
+                        <p class="text-xs text-slate-400">VMware ESXi, VirtualBox, Docker containers, GNS3 simulation, Cisco Packet Tracer, Git, and Markdown documentation.</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <span class="px-3 py-1 rounded bg-slate-800 text-xs font-mono text-slate-300">VMware</span>
+                    <span class="px-3 py-1 rounded bg-slate-800 text-xs font-mono text-slate-300">Docker</span>
+                    <span class="px-3 py-1 rounded bg-slate-800 text-xs font-mono text-slate-300">VirtualBox</span>
+                    <span class="px-3 py-1 rounded bg-slate-800 text-xs font-mono text-slate-300">Packet Tracer</span>
+                    <span class="px-3 py-1 rounded bg-slate-800 text-xs font-mono text-slate-300">GNS3</span>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="projects" class="py-24 bg-navy-900 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-light text-xs font-mono font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-brand-blue/10 border border-brand-blue/30">
+                    Practical Work & Labs
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">
+                    Featured <span class="text-brand-light">Projects</span>
+                </h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                    Real hands-on labs and network infrastructure designs completed during SNAC training.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Project 1 -->
+                <div class="glass-panel rounded-2xl overflow-hidden glass-panel-hover flex flex-col justify-between border border-slate-800">
+                    <div>
+                        <div class="h-48 bg-slate-950 p-4 relative overflow-hidden flex items-center justify-center border-b border-slate-800 group">
+                            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#38BDF8_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                            <i class="fa-solid fa-sitemap text-6xl text-brand-blue/60 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="absolute top-3 right-3 px-2.5 py-1 rounded bg-brand-blue/30 text-brand-light font-mono text-[10px] font-bold">
+                                Enterprise Topology
+                            </span>
+                        </div>
+                        
+                        <div class="p-6 space-y-3">
+                            <h3 class="text-lg font-bold text-white hover:text-brand-light transition-colors">
+                                Multi-VLAN Enterprise Campus Network
+                            </h3>
+                            <p class="text-slate-400 text-xs leading-relaxed line-clamp-3">
+                                Designed and simulated a multi-building enterprise network featuring segmented VLANs, Inter-VLAN routing, OSPF dynamic routing, and redundant spanning-tree protocol (STP).
+                            </p>
+                            
+                            <div class="flex flex-wrap gap-1.5 pt-2">
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-brand-light">Cisco IOS</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-slate-300">VLAN</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-slate-300">OSPF</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 pt-0">
+                        <button onclick="openProjectModal('enterprise')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-brand-blue text-slate-200 hover:text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2">
+                            <span>View Topology Specs</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="glass-panel rounded-2xl overflow-hidden glass-panel-hover flex flex-col justify-between border border-slate-800">
+                    <div>
+                        <div class="h-48 bg-slate-950 p-4 relative overflow-hidden flex items-center justify-center border-b border-slate-800 group">
+                            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#10B981_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                            <i class="fa-solid fa-shield-cat text-6xl text-emerald-500/60 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="absolute top-3 right-3 px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold">
+                                Cyber Defense
+                            </span>
+                        </div>
+                        
+                        <div class="p-6 space-y-3">
+                            <h3 class="text-lg font-bold text-white hover:text-brand-light transition-colors">
+                                PfSense Firewall Gateway & IPsec VPN
+                            </h3>
+                            <p class="text-slate-400 text-xs leading-relaxed line-clamp-3">
+                                Configured a high-security pfSense edge gateway with Snort IDS/IPS threat detection, Squid proxy filtering, and Site-to-Site IPsec VPN tunnel for remote site connection.
+                            </p>
+                            
+                            <div class="flex flex-wrap gap-1.5 pt-2">
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-emerald-400">PfSense</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-slate-300">Snort IDS</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-slate-300">IPsec</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 pt-0">
+                        <button onclick="openProjectModal('pfsense')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-brand-blue text-slate-200 hover:text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2">
+                            <span>View Topology Specs</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="glass-panel rounded-2xl overflow-hidden glass-panel-hover flex flex-col justify-between border border-slate-800">
+                    <div>
+                        <div class="h-48 bg-slate-950 p-4 relative overflow-hidden flex items-center justify-center border-b border-slate-800 group">
+                            <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#F59E0B_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                            <i class="fa-brands fa-ubuntu text-6xl text-amber-500/60 group-hover:scale-110 transition-transform duration-300"></i>
+                            <span class="absolute top-3 right-3 px-2.5 py-1 rounded bg-amber-500/20 text-amber-400 font-mono text-[10px] font-bold">
+                                SysAdmin & DevOps
+                            </span>
+                        </div>
+                        
+                        <div class="p-6 space-y-3">
+                            <h3 class="text-lg font-bold text-white hover:text-brand-light transition-colors">
+                                Automated Linux Web & Mail Infrastructure
+                            </h3>
+                            <p class="text-slate-400 text-xs leading-relaxed line-clamp-3">
+                                Deployed automated Linux server stack running Nginx reverse proxy with SSL certificates, Postfix/Dovecot secure email server, and automated backup Bash scripts.
+                            </p>
+                            
+                            <div class="flex flex-wrap gap-1.5 pt-2">
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-amber-400">Ubuntu Server</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-slate-300">Nginx</span>
+                                <span class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-slate-300">Bash Automation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 pt-0">
+                        <button onclick="openProjectModal('linux')" class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-brand-blue text-slate-200 hover:text-white font-semibold text-xs transition-colors flex items-center justify-center gap-2">
+                            <span>View Topology Specs</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <section id="education" class="py-24 bg-navy-950 relative border-t border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-light text-xs font-mono font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-brand-blue/10 border border-brand-blue/30">
+                    Academic Journey
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">
+                    Education & <span class="text-brand-light">Certifications</span>
+                </h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                    Solid academic background in IT system & network administration.
+                </p>
+            </div>
+
+            <div class="max-w-3xl mx-auto relative border-l-2 border-slate-800 pl-6 sm:pl-8 space-y-12">
+                
+                <div class="relative group">
+                    <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-5 h-5 rounded-full bg-brand-blue border-4 border-navy-950 shadow-lg shadow-brand-blue/50 group-hover:scale-125 transition-transform"></div>
+                    
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="px-3 py-1 rounded-full bg-brand-blue/20 text-brand-light font-mono text-xs font-bold">
+                                2024 - Present
+                            </span>
+                            <span class="text-xs text-slate-400 font-mono"><i class="fa-solid fa-location-dot text-brand-light mr-1"></i>Phnom Penh, Cambodia</span>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-white">System & Network Administration & Cybersecurity (SNAC)</h3>
+                        <h4 class="text-sm font-medium text-brand-light">Passerelles Numériques Cambodia (PNC)</h4>
+
+                        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                            Intensive technical education covering Cisco networking principles, Linux/Windows administration, cloud computing, cybersecurity defense strategies, soft skills, and professional English.
+                        </p>
+
+                        <div class="pt-2 flex flex-wrap gap-2">
+                            <span class="px-2.5 py-1 rounded bg-slate-800 text-[11px] font-mono text-slate-300">Routing & Switching</span>
+                            <span class="px-2.5 py-1 rounded bg-slate-800 text-[11px] font-mono text-slate-300">Linux SysAdmin</span>
+                            <span class="px-2.5 py-1 rounded bg-slate-800 text-[11px] font-mono text-slate-300">Network Security</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <div class="absolute -left-[31px] sm:-left-[39px] top-1.5 w-5 h-5 rounded-full bg-emerald-400 border-4 border-navy-950 shadow-lg shadow-emerald-400/50 group-hover:scale-125 transition-transform"></div>
+                    
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800 space-y-3">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-mono text-xs font-bold">
+                                Certifications & Badges
+                            </span>
+                            <span class="text-xs text-slate-400 font-mono">In Progress & Earned</span>
+                        </div>
+
+                        <h3 class="text-xl font-bold text-white">Professional Certifications</h3>
+                        
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-300 font-mono">
+                            <li class="flex items-center gap-2">
+                                <i class="fa-solid fa-certificate text-emerald-400"></i>
+                                <span>Cisco CCNA Training (Introduction to Networks & Switching)</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fa-solid fa-certificate text-emerald-400"></i>
+                                <span>Linux Essentials (LPI / NDG Linux Certification)</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fa-solid fa-certificate text-emerald-400"></i>
+                                <span>Cybersecurity Fundamentals Certificate</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <section id="terminal" class="py-24 bg-navy-900 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-brand-light text-xs font-mono font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-brand-blue/10 border border-brand-blue/30">
+                    Live CLI Experience
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">
+                    Interactive <span class="text-brand-light">Terminal</span>
+                </h2>
+                <p class="text-slate-400 mt-3 text-sm">
+                    Type commands below to interact directly with Lorn Chantha's system portfolio console.
+                </p>
+            </div>
+
+            <div class="max-w-4xl mx-auto rounded-2xl overflow-hidden glass-panel border border-slate-700 shadow-2xl font-mono">
+                
+                <div class="bg-slate-950 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                        <span class="text-xs text-slate-400 ml-2">chantha@snac-node-01:~</span>
+                    </div>
+                    <div class="text-slate-500 text-xs">
+                        bash 5.2.15
+                    </div>
+                </div>
+
+                <div id="terminal-body" class="p-5 h-80 overflow-y-auto space-y-2 text-xs sm:text-sm bg-navy-950/90 text-slate-200">
+                    <div class="text-emerald-400">
+                        Welcome to Lorn Chantha's Interactive CLI v1.0.0 (x86_64-pc-linux-gnu)
+                    </div>
+                    <div class="text-slate-400">
+                        Type <span class="text-brand-light font-bold">'help'</span> to view available commands. Try running <span class="text-brand-light font-bold">'neofetch'</span> or <span class="text-brand-light font-bold">'skills'</span>!
+                    </div>
+                    <div id="terminal-output"></div>
+                </div>
+
+                <div class="bg-slate-950 p-3 border-t border-slate-800 flex items-center gap-2">
+                    <span class="text-emerald-400 text-xs font-bold pl-2">chantha@snac-node-01:~$</span>
+                    <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" placeholder="type command here..." class="w-full bg-transparent border-none text-brand-light text-xs sm:text-sm font-mono focus:outline-none focus:ring-0">
+                    <button id="terminal-send-btn" class="px-3 py-1 rounded bg-brand-blue hover:bg-blue-600 text-white text-xs font-semibold">
+                        Run
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <section id="contact" class="py-24 bg-navy-950 relative border-t border-slate-800/80">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-light text-xs font-mono font-semibold uppercase tracking-widest px-3 py-1 rounded-full bg-brand-blue/10 border border-brand-blue/30">
+                    Get In Touch
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-3">
+                    Contact <span class="text-brand-light">Lorn Chantha</span>
+                </h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                    Interested in collaboration, networking labs, or hiring for internships? Reach out directly!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 space-y-6">
+                        <h3 class="text-xl font-bold text-white">Contact Information</h3>
+                        <p class="text-xs sm:text-sm text-slate-300">
+                            Feel free to contact me via email or social platforms. I will respond as soon as possible.
+                        </p>
+
+                        <div class="space-y-4 pt-2">
+                            <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                                <div class="w-10 h-10 rounded-lg bg-brand-blue/20 flex items-center justify-center text-brand-light text-lg">
+                                    <i class="fa-solid fa-envelope"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="text-[10px] text-slate-400 font-mono uppercase">Email Address</p>
+                                    <a href="mailto:lorn.chantha@passerellesnumeriques.org" class="text-xs sm:text-sm font-semibold text-white hover:text-brand-light transition-colors truncate block">
+                                        lorn.chantha@passerellesnumeriques.org
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                                <div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400 text-lg">
+                                    <i class="fa-brands fa-telegram"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-slate-400 font-mono uppercase">Telegram</p>
+                                    <a href="https://t.me/" target="_blank" class="text-xs sm:text-sm font-semibold text-white hover:text-emerald-400 transition-colors">
+                                        @LornChantha_SNAC
+                                    </a>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                                <div class="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 text-lg">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-slate-400 font-mono uppercase">Location</p>
+                                    <p class="text-xs sm:text-sm font-semibold text-white">
+                                        Phnom Penh, Cambodia (PNC Campus)
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="copyEmail()" class="w-full py-3 rounded-xl glass-panel border border-brand-light/30 hover:border-brand-light text-brand-light font-semibold text-xs flex items-center justify-center gap-2 transition-all">
+                            <i class="fa-solid fa-copy"></i>
+                            <span id="copy-btn-text">Copy Email to Clipboard</span>
+                        </button>
+
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7">
+                    <form id="contact-form" onsubmit="handleFormSubmit(event)" class="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 space-y-5">
+                        <h3 class="text-xl font-bold text-white">Send Me a Message</h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-mono text-slate-300 mb-1">Your Name</label>
+                                <input type="text" required placeholder="e.g. Sokha Chan" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-brand-blue">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-mono text-slate-300 mb-1">Your Email</label>
+                                <input type="email" required placeholder="name@company.com" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-brand-blue">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-mono text-slate-300 mb-1">Subject</label>
+                            <input type="text" required placeholder="Inquiry / Internship Opportunity" class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-brand-blue">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-mono text-slate-300 mb-1">Message</label>
+                            <textarea rows="4" required placeholder="Write your message here..." class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-sm focus:outline-none focus:border-brand-blue resize-none"></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-brand-blue to-blue-600 hover:from-blue-600 hover:to-brand-blue text-white font-semibold text-sm shadow-lg shadow-brand-blue/30 flex items-center justify-center gap-2 transition-all">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span>Send Message</span>
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy-950 py-12 border-t border-slate-800 text-slate-400 text-xs font-mono">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-brand-blue flex items-center justify-center text-white font-bold">
+                    LC
+                </div>
+                <div>
+                    <span class="text-white font-bold text-sm">Lorn Chantha</span>
+                    <p class="text-[11px] text-slate-500">SNAC Student • Passerelles Numériques Cambodia</p>
+                </div>
+            </div>
+
+            <p class="text-center sm:text-right">
+                © 2026 Lorn Chantha. Built with HTML, Tailwind & Three.js.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Interactive Modal -->
+    <div id="project-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-navy-950/80 backdrop-blur-md">
+        <div class="glass-panel max-w-2xl w-full rounded-2xl p-6 sm:p-8 border border-brand-light/30 space-y-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeProjectModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div id="modal-content">
+                <!-- Dynamically loaded modal content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 hidden px-5 py-3 rounded-xl glass-panel border border-brand-light text-white text-xs font-mono shadow-2xl flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-base" id="toast-icon"></i>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <script>
+        /* THREE.JS 3D INTERACTIVE SCENE CODE */
+        let scene, camera, renderer, avatarGroup;
+        let isSpinning = true;
+        let profileTexture = null;
+        let profileMeshMaterial = null;
+
+        function createDefaultProfileTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // Radial background gradient
+            const grad = ctx.createRadialGradient(256, 256, 50, 256, 256, 256);
+            grad.addColorStop(0, '#1E293B');
+            grad.addColorStop(1, '#0B0F19');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 512, 512);
+
+            // Tech Ring Borders
+            ctx.strokeStyle = '#38BDF8';
+            ctx.lineWidth = 12;
+            ctx.beginPath();
+            ctx.arc(256, 256, 230, 0, Math.PI * 2);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#2563EB';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.arc(256, 256, 210, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Default User Avatar Silhouette
+            ctx.fillStyle = '#2563EB';
+            ctx.beginPath();
+            ctx.arc(256, 200, 75, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(256, 400, 130, 0, Math.PI, true);
+            ctx.fill();
+
+            // Text Label
+            ctx.fillStyle = '#38BDF8';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('LORN CHANTHA', 256, 470);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.center.set(0.5, 0.5);
+            texture.rotation = Math.PI; // Correct default texture orientation for Cylinder Top Cap
+            return texture;
+        }
+
+        function initThreeJS() {
+            const container = document.getElementById('canvas-container');
+            const canvas = document.getElementById('three-canvas');
+
+            if (!container || !canvas) return;
+
+            // Scene & Camera
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(0, 0, 7);
+
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            // Lighting setup
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+            scene.add(ambientLight);
+
+            const blueLight = new THREE.PointLight(0x38BDF8, 2.5, 20);
+            blueLight.position.set(4, 4, 4);
+            scene.add(blueLight);
+
+            const cyanLight = new THREE.PointLight(0x2563EB, 2, 20);
+            cyanLight.position.set(-4, -4, -2);
+            scene.add(cyanLight);
+
+            // Create Master Group
+            avatarGroup = new THREE.Group();
+            scene.add(avatarGroup);
+
+            // 1. Stylized 3D Profile Medallion / Disc
+            profileTexture = createDefaultProfileTexture();
+            
+            // Cylinder: radiusTop, radiusBottom, height, radialSegments
+            const discGeo = new THREE.CylinderGeometry(1.4, 1.4, 0.12, 64);
+            
+            // Materials for the cylinder (sides, top/front face, bottom/back face)
+            const sideMat = new THREE.MeshStandardMaterial({
+                color: 0x2563EB,
+                metalness: 0.9,
+                roughness: 0.2
+            });
+
+            profileMeshMaterial = new THREE.MeshStandardMaterial({
+                map: profileTexture,
+                roughness: 0.3,
+                metalness: 0.2
+            });
+
+            const backMat = new THREE.MeshStandardMaterial({
+                color: 0x0F172A,
+                metalness: 0.8,
+                roughness: 0.3
+            });
+
+            // Materials array for cylinder faces
+            const discMaterials = [sideMat, profileMeshMaterial, backMat];
+            const profileDisc = new THREE.Mesh(discGeo, discMaterials);
+            
+            // Rotate disc toward camera and ensure photo is right-side up
+            profileDisc.rotation.x = Math.PI / 2;
+            profileDisc.rotation.z = 0; // Fixed: Set to 0 so photo appears upright natively
+            avatarGroup.add(profileDisc);
+
+            // Glowing Outer Ring Frame around 3D Profile Photo
+            const ringGeo = new THREE.TorusGeometry(1.5, 0.05, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ color: 0x38BDF8 });
+            const ringMesh = new THREE.Mesh(ringGeo, ringMat);
+            avatarGroup.add(ringMesh);
+
+            // 2. Orbiting IT Elements
+            // (a) Laptop
+            const laptopGroup = new THREE.Group();
+            const baseGeo = new THREE.BoxGeometry(0.7, 0.04, 0.5);
+            const laptopMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.8 });
+            const laptopBase = new THREE.Mesh(baseGeo, laptopMat);
+            
+            const screenGeo = new THREE.BoxGeometry(0.7, 0.45, 0.03);
+            const screenMat = new THREE.MeshBasicMaterial({ color: 0x38BDF8 });
+            const laptopScreen = new THREE.Mesh(screenGeo, screenMat);
+            laptopScreen.position.set(0, 0.22, -0.24);
+            laptopScreen.rotation.x = -0.2;
+
+            laptopGroup.add(laptopBase);
+            laptopGroup.add(laptopScreen);
+            laptopGroup.position.set(1.9, -0.6, 0.5);
+            laptopGroup.rotation.y = -0.5;
+            avatarGroup.add(laptopGroup);
+
+            // (b) Cyber Defense Shield
+            const shieldGeo = new THREE.OctahedronGeometry(0.45, 0);
+            const shieldMat = new THREE.MeshStandardMaterial({ color: 0x10B981, wireframe: true });
+            const shieldMesh = new THREE.Mesh(shieldGeo, shieldMat);
+            shieldMesh.position.set(-1.9, 0.9, 0.3);
+            avatarGroup.add(shieldMesh);
+
+            // (c) Wireframe Network Sphere Around Avatar
+            const netGeo = new THREE.IcosahedronGeometry(2.3, 2);
+            const netMat = new THREE.MeshBasicMaterial({ color: 0x38BDF8, wireframe: true, transparent: true, opacity: 0.18 });
+            const netSphere = new THREE.Mesh(netGeo, netMat);
+            avatarGroup.add(netSphere);
+
+            // (d) Floating Binary/Data Nodes
+            const particleCount = 50;
+            const particleGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 6;
+                positions[i + 1] = (Math.random() - 0.5) * 6;
+                positions[i + 2] = (Math.random() - 0.5) * 6;
+            }
+
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMat = new THREE.PointsMaterial({ size: 0.05, color: 0x38BDF8 });
+            const particleSystem = new THREE.Points(particleGeo, particleMat);
+            avatarGroup.add(particleSystem);
+
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+
+                avatarGroup.rotation.y += deltaX * 0.008;
+                avatarGroup.rotation.x += deltaY * 0.008;
+
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            window.addEventListener('mouseup', () => { isDragging = false; });
+
+            // Touch events for mobile responsiveness
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isDragging = true;
+                    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+                }
+            });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (!isDragging || e.touches.length !== 1) return;
+                const deltaX = e.touches[0].clientX - previousMousePosition.x;
+                const deltaY = e.touches[0].clientY - previousMousePosition.y;
+
+                avatarGroup.rotation.y += deltaX * 0.008;
+                avatarGroup.rotation.x += deltaY * 0.008;
+
+                previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+            });
+
+            window.addEventListener('touchend', () => { isDragging = false; });
+
+            container.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                container.classList.add('border-4', 'border-brand-light');
+            });
+
+            container.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                container.classList.remove('border-4', 'border-brand-light');
+            });
+
+            container.addEventListener('drop', (e) => {
+                e.preventDefault();
+                container.classList.remove('border-4', 'border-brand-light');
+                if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    uploadHeroProfilePhoto(e.dataTransfer.files[0]);
+                }
+            });
+
+            // Handle Resize
+            window.addEventListener('resize', () => {
+                if (!container) return;
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+
+            // Animation Loop
+            function animate() {
+                requestAnimationFrame(animate);
+                if (avatarGroup && isSpinning) {
+                    avatarGroup.rotation.y += 0.005;
+                }
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        let photoRotationAngle = 0;
+
+        function uploadHeroProfilePhoto(eventOrFile) {
+            let file = null;
+            if (eventOrFile instanceof File) {
+                file = eventOrFile;
+            } else if (eventOrFile && eventOrFile.target && eventOrFile.target.files) {
+                file = eventOrFile.target.files[0];
+            }
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function() {
+                    const texture = new THREE.Texture(img);
+                    texture.center.set(0.5, 0.5);
+                    // Add Math.PI (180deg) offset so uploaded images map right-side up
+                    texture.rotation = Math.PI + photoRotationAngle;
+                    texture.needsUpdate = true;
+
+                    if (profileMeshMaterial) {
+                        profileMeshMaterial.map = texture;
+                        profileMeshMaterial.color.setHex(0xffffff);
+                        profileMeshMaterial.needsUpdate = true;
+                    }
+
+                    showToast('Profile photo updated & aligned!', 'fa-camera');
+                };
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function rotateProfilePhoto() {
+            if (!profileMeshMaterial || !profileMeshMaterial.map) return;
+            
+            photoRotationAngle += Math.PI / 2; // Rotate by 90 degrees on each click
+            if (photoRotationAngle >= Math.PI * 2) photoRotationAngle = 0;
+            
+            profileMeshMaterial.map.center.set(0.5, 0.5);
+            profileMeshMaterial.map.rotation = Math.PI + photoRotationAngle;
+            profileMeshMaterial.map.needsUpdate = true;
+            
+            showToast('Photo rotated 90°', 'fa-rotate');
+        }
+
+        /* -------------------------------------------------------------
+           INTERACTIVE TERMINAL COMMAND PROCESSOR
+           ------------------------------------------------------------- */
+        const terminalInput = document.getElementById('terminal-input');
+        const terminalOutput = document.getElementById('terminal-output');
+        const terminalSendBtn = document.getElementById('terminal-send-btn');
+
+        const commands = {
+            'help': 'Available commands: <span class="text-brand-light">about</span>, <span class="text-brand-light">skills</span>, <span class="text-brand-light">projects</span>, <span class="text-brand-light">neofetch</span>, <span class="text-brand-light">clear</span>, <span class="text-brand-light">contact</span>, <span class="text-brand-light">ping</span>',
+            'about': 'Lorn Chantha - System & Network Administration & Cybersecurity student at Passerelles Numériques Cambodia.',
+            'skills': 'Cisco Routing/Switching, Linux (Ubuntu/Debian), PfSense Firewall, OpenVPN, Wireshark, Bash Automation.',
+            'projects': '1. Multi-VLAN Enterprise Network | 2. PfSense Security Gateway | 3. Automated Linux Web Stack',
+            'contact': 'Email: lorn.chantha@passerellesnumeriques.org | Telegram: @LornChantha_SNAC',
+            'ping': 'PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.<br>64 bytes from 8.8.8.8: icmp_seq=1 ttl=117 time=12.4 ms<br>64 bytes from 8.8.8.8: icmp_seq=2 ttl=117 time=11.8 ms<br><span class="text-emerald-400">--- 8.8.8.8 ping statistics --- 0% packet loss</span>',
+            'neofetch': `<pre class="text-xs font-mono text-brand-light">
+   .-.       OS: SNAC Linux x86_64
+  (   )      Host: Passerelles Numériques Cambodia
+   \`-\`       Kernel: 6.5.0-PNC-SNAC
+  /| |\\      Uptime: 2 Years in IT Studies
+ ( | | )     Shell: bash 5.2.15
+  \`-\`-\`      RAM: 16GB / 32GB
+</pre>`
+        };
+
+        function runTerminalCommand() {
+            if (!terminalInput) return;
+            const cmd = terminalInput.value.trim().toLowerCase();
+            if (!cmd) return;
+
+            const cmdLine = document.createElement('div');
+            cmdLine.innerHTML = `<span class="text-emerald-400">chantha@snac-node-01:~$</span> <span class="text-white">${cmd}</span>`;
+            terminalOutput.appendChild(cmdLine);
+
+            if (cmd === 'clear') {
+                terminalOutput.innerHTML = '';
+            } else if (commands[cmd]) {
+                const res = document.createElement('div');
+                res.className = 'text-slate-300 ml-2 mb-2';
+                res.innerHTML = commands[cmd];
+                terminalOutput.appendChild(res);
+            } else {
+                const err = document.createElement('div');
+                err.className = 'text-rose-400 ml-2 mb-2';
+                err.innerText = `Command not found: ${cmd}. Type 'help' for options.`;
+                terminalOutput.appendChild(err);
+            }
+
+            terminalInput.value = '';
+            const body = document.getElementById('terminal-body');
+            body.scrollTop = body.scrollHeight;
+        }
+
+        terminalInput?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') runTerminalCommand();
+        });
+
+        terminalSendBtn?.addEventListener('click', runTerminalCommand);
+
+        /* -------------------------------------------------------------
+           ZIP EXPORT & DOWNLOAD LOGIC
+           ------------------------------------------------------------- */
+        function downloadPortfolioZip() {
+            showToast('Packaging project files into ZIP...', 'fa-file-zipper');
+            
+            try {
+                const zip = new JSZip();
+                const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                zip.file("index.html", htmlContent);
+                
+                const readmeContent = `# Lorn Chantha - System & Network Administration Portfolio
+
+Thank you for downloading Lorn Chantha's Portfolio Website.
+
+## 🚀 How to Run locally:
+1. Extract all files from this ZIP archive.
+2. Double-click \`index.html\` to open it in any web browser.
+3. No build tools required—all CDN dependencies load automatically over HTTPS.
+
+Built for Lorn Chantha | Passerelles Numériques Cambodia (PNC) - SNAC Batch.
+`;
+                zip.file("README.md", readmeContent);
+
+                zip.generateAsync({ type: "blob" }).then(function(content) {
+                    saveAs(content, "Lorn_Chantha_Portfolio.zip");
+                    showToast('ZIP downloaded successfully!', 'fa-circle-check');
+                });
+            } catch (err) {
+                console.error("ZIP Generation Error:", err);
+                showToast('Downloading HTML file directly...', 'fa-download');
+                const element = document.createElement('a');
+                const file = new Blob([document.documentElement.outerHTML], {type: 'text/html'});
+                element.href = URL.createObjectURL(file);
+                element.download = "index.html";
+                document.body.appendChild(element);
+                element.click();
+                document.body.removeChild(element);
+            }
+        }
+
+        function downloadCV() {
+            showToast('Initiating CV Download for Lorn Chantha...', 'fa-file-arrow-down');
+        }
+
+        function copyEmail() {
+            const email = 'lorn.chantha@passerellesnumeriques.org';
+            document.execCommand('copy');
+            showToast('Email address copied to clipboard!', 'fa-copy');
+            document.getElementById('copy-btn-text').innerText = 'Copied!';
+            setTimeout(() => {
+                document.getElementById('copy-btn-text').innerText = 'Copy Email to Clipboard';
+            }, 3000);
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            showToast('Message sent successfully! Lorn Chantha will reply soon.', 'fa-paper-plane');
+            document.getElementById('contact-form').reset();
+        }
+
+        function showToast(message, iconClass = 'fa-circle-check') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastMessage.innerText = message;
+            toastIcon.className = `fa-solid ${iconClass} text-emerald-400 text-base`;
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+
+        // Project Modal Spec Opener
+        function openProjectModal(type) {
+            const modal = document.getElementById('project-modal');
+            const content = document.getElementById('modal-content');
+            
+            const specs = {
+                enterprise: `
+                    <h3 class="text-xl font-bold text-white mb-2">Multi-VLAN Enterprise Campus Network</h3>
+                    <p class="text-xs font-mono text-brand-light mb-4">Cisco IOS • OSPF • VLAN Segmentation • STP Redundancy</p>
+                    <div class="space-y-3 text-xs text-slate-300">
+                        <p>This lab demonstrates a multi-building enterprise network designed for high availability and strict department isolation.</p>
+                        <ul class="list-disc pl-5 space-y-1 font-mono">
+                            <li>VLAN 10: Administration (192.168.10.0/24)</li>
+                            <li>VLAN 20: Engineering & IT (192.168.20.0/24)</li>
+                            <li>VLAN 30: Guest Wi-Fi (192.168.30.0/24)</li>
+                            <li>OSPF Area 0 dynamic routing across core switches</li>
+                        </ul>
+                    </div>
+                `,
+                pfsense: `
+                    <h3 class="text-xl font-bold text-white mb-2">PfSense Firewall Gateway & IPsec VPN</h3>
+                    <p class="text-xs font-mono text-emerald-400 mb-4">PfSense • Snort IDS/IPS • IPsec Tunnel • Squid Proxy</p>
+                    <div class="space-y-3 text-xs text-slate-300">
+                        <p>Full perimeter firewall defense deployment securing internal enterprise assets.</p>
+                        <ul class="list-disc pl-5 space-y-1 font-mono">
+                            <li>Dual WAN Failover load balancing</li>
+                            <li>Snort intrusion detection with auto-blocking rules</li>
+                            <li>IPsec Site-to-Site AES-256 encrypted tunnel</li>
+                        </ul>
+                    </div>
+                `,
+                linux: `
+                    <h3 class="text-xl font-bold text-white mb-2">Automated Linux Web & Mail Stack</h3>
+                    <p class="text-xs font-mono text-amber-400 mb-4">Ubuntu Server 22.04 LTS • Nginx • Postfix • Bash Automation</p>
+                    <div class="space-y-3 text-xs text-slate-300">
+                        <p>Automated server configuration scripts for deploying production-ready web and mail services.</p>
+                        <ul class="list-disc pl-5 space-y-1 font-mono">
+                            <li>Nginx Reverse Proxy with Let's Encrypt SSL auto-renewal</li>
+                            <li>Postfix + Dovecot IMAP/SMTP secure mail transport</li>
+                            <li>Daily automated MySQL/Filesystem backup script to cloud storage</li>
+                        </ul>
+                    </div>
+                `
+            };
+
+            content.innerHTML = specs[type] || 'No details available.';
+            modal.classList.remove('hidden');
+        }
+
+        function closeProjectModal() {
+            document.getElementById('project-modal').classList.add('hidden');
+        }
+
+        // Toggle 3D Controls
+        document.getElementById('btn-toggle-spin')?.addEventListener('click', () => {
+            isSpinning = !isSpinning;
+            showToast(`3D Rotation ${isSpinning ? 'Enabled' : 'Paused'}`, 'fa-arrows-spin');
+        });
+
+        document.getElementById('btn-reset-cam')?.addEventListener('click', () => {
+            if (avatarGroup) {
+                avatarGroup.rotation.set(0, 0, 0);
+                showToast('Camera position reset', 'fa-rotate-left');
+            }
+        });
+
+        // Mobile Menu Drawer Handler
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuBtn?.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Initialize 3D Scene when window loads
+        window.onload = function() {
+            initThreeJS();
+        };
+    </script>
+</body>
+</html>
